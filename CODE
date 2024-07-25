@@ -1,0 +1,43 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the datasets
+basic_info_df = pd.read_excel('Entertainer - Basic Info.xlsx')
+breakthrough_info_df = pd.read_excel('Entertainer - Breakthrough Info.xlsx')
+last_work_info_df = pd.read_excel('Entertainer - Last work Info.xlsx')
+
+# Handle missing values if necessary
+basic_info_df.fillna(method='ffill', inplace=True)
+breakthrough_info_df.fillna(method='ffill', inplace=True)
+last_work_info_df.fillna(method='ffill', inplace=True)
+
+# Merge the datasets on a common column, e.g., "Entertainer"
+merged_df = basic_info_df.merge(breakthrough_info_df, on='Entertainer', how='left')
+merged_df = merged_df.merge(last_work_info_df, on='Entertainer', how='left')
+
+# Example: Analyze the distribution of Age from the basic info
+if 'Birth Year' in basic_info_df.columns:
+    current_year = 2024
+    basic_info_df['Age'] = current_year - basic_info_df['Birth Year']
+
+    plt.figure(figsize=(10, 6))
+    sns.histplot(basic_info_df['Age'], bins=15, kde=True)
+    plt.title('Distribution of Age')
+    plt.xlabel('Age')
+    plt.ylabel('Frequency')
+    plt.show()
+
+# Example: Analyze the distribution of Gender
+if 'Gender (traditional)' in basic_info_df.columns:
+    plt.figure(figsize=(10, 6))
+    sns.countplot(x='Gender (traditional)', data=basic_info_df)
+    plt.title('Distribution of Gender')
+    plt.xlabel('Gender')
+    plt.ylabel('Count')
+    plt.show()
+
+# Save the cleaned and merged dataset to a new Excel file
+cleaned_file_path = 'Cleaned_Entertainer_Info.xlsx'
+merged_df.to_excel(cleaned_file_path, index=False)
+print(f"\nCleaned dataset saved to {cleaned_file_path}")
